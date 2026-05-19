@@ -11,7 +11,6 @@ Requires the .env file at project root with DB_* credentials.
 import json
 import os
 import random
-import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 

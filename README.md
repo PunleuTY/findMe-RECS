@@ -62,6 +62,9 @@ findMe-RS-repo/
 │       ├── content.py       ← User signals + content score blending
 │       └── weights.py       ← Adaptive content/collab/pop weight schedule
 │
+├── scripts/
+│   └── seed_synthetic_products.py  ← One-time DB seeder (500 BenefitMe products)
+│
 ├── tests/
 │   ├── conftest.py          ← In-memory fixtures (no DB required)
 │   └── ml/
@@ -73,6 +76,7 @@ findMe-RS-repo/
 │   └── src/lib/             ← api.ts, types.ts, format.ts, session.ts, tracker.ts
 │
 ├── data/generated/          ← Runtime JSON (gitignored; populated by data_loader)
+├── db-revision-info.md      ← BenefitMe product taxonomy + dataset spec
 ├── .env.example
 └── pyproject.toml
 ```
@@ -92,9 +96,12 @@ findMe-RS-repo/
 ```bash
 # Create database and tables
 mysql -u root -p < backend/database/schema.sql
+
+# Seed 500 synthetic BenefitMe products (replaces any existing product data)
+python3 scripts/seed_synthetic_products.py
 ```
 
-Populate with your data or connect to your existing MySQL instance.
+The seeder populates `benefit_me_categories` (9 categories) and `crm_products` (500 products) with realistic synthetic data covering Fashion, Electronics, Food, Beauty, and more. See [db-revision-info.md](db-revision-info.md) for the full taxonomy and dataset spec.
 
 ### 2. Backend
 
