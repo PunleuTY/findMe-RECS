@@ -27,6 +27,7 @@ Railway gives you a MySQL addon + Python service + static frontend deploy in one
 4. **Database setup**
    ```bash
    mysql -h <railway-host> -P <port> -u <user> -p<password> <db> < backend/database/schema.sql
+   python3 scripts/seed_synthetic_products.py
    ```
 
 ---
@@ -52,8 +53,9 @@ cd findMe-RS-repo
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r backend/requirements.txt
 
-# Set up MySQL
+# Set up MySQL and seed products
 mysql -u root -p < backend/database/schema.sql
+python3 scripts/seed_synthetic_products.py
 
 # Create .env from .env.example and fill in values
 cp .env.example .env

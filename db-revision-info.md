@@ -1,268 +1,168 @@
-```
-# 🧠 BenefitMe Synthetic E-Commerce Dataset Generator Prompt
+# BenefitMe Product Dataset — Taxonomy & Spec
 
-You are a data generation engine for an e-commerce recommendation system.
-
-Your task is to generate a **synthetic product dataset** for a marketplace called “BenefitMe”.
-
-You must follow the schema, taxonomy, and constraints exactly. Do not invent new categories or sub-categories outside what is defined below.
+Defines the synthetic product catalogue used in the `findme_rs_db` database.
+Applied via `scripts/seed_synthetic_products.py`.
 
 ---
 
-# 📦 OUTPUT FORMAT RULES
+## Category Taxonomy
 
-- Output format: **JSON Lines (one product per line)**
-- No explanations, no comments, no markdown in output
-- Each product must be valid JSON
-- Ensure all fields are present
-- Ensure values are realistic and consistent across fields
+### Fashion & Apparel — `store` (90 products)
+| Sub-category |
+|---|
+| T-shirts, Shirts (formal), Shirts (casual), Jeans, Trousers, Jackets, Traditional wear |
+| Dresses, Tops / Blouses, Skirts, Jeans / Pants, Outerwear |
+| Boys clothing, Girls clothing, Infant wear |
+| Sneakers, Formal shoes, Sandals / Slippers, Boots |
+| Bags (backpacks, handbags), Belts, Hats / Caps, Wallets |
+
+### Electronics & Devices — `store` (55 products)
+| Sub-category |
+|---|
+| Android phones, iPhones, Feature phones |
+| Laptops, Desktops, Monitors, PC components |
+| Headphones, Earbuds, Speakers |
+| Smartwatches, Smart home devices, Fitness trackers |
+| Chargers, Cables, Power banks, Cases |
+
+### Home & Living — `store` (55 products)
+| Sub-category |
+|---|
+| Beds, Tables, Chairs, Sofas, Storage |
+| Cookware, Utensils, Dinnerware, Appliances |
+| Wall art, Lighting, Carpets, Curtains |
+| Detergents, Cleaning tools, Disinfectants |
+
+### Beauty & Personal Care — `store` (55 products)
+| Sub-category |
+|---|
+| Face wash, Moisturizer, Sunscreen, Serums |
+| Lipstick, Foundation, Eye makeup, Brushes |
+| Shampoo, Conditioner, Hair treatments |
+| Soap, Deodorant, Oral care |
+
+### Food & Groceries — `food` (70 products)
+| Sub-category |
+|---|
+| Vegetables, Fruits, Meat & seafood |
+| Snacks, Instant noodles, Cereals |
+| Soft drinks, Coffee / Tea, Juices |
+| Rice / grains, Cooking oil, Condiments |
+
+### Books & Education — `store` (35 products)
+| Sub-category |
+|---|
+| Computer Science, Mathematics, Business |
+| Self-development, Productivity, Communication, Leadership |
+| Story books, Learning books |
+| Notebooks, Pens, Art supplies |
+
+### Sports & Outdoors — `store` (50 products)
+| Sub-category |
+|---|
+| Dumbbells, Yoga mats, Resistance bands |
+| Football, Basketball, Badminton |
+| Camping tents, Backpacks, Water bottles |
+
+### Toys & Baby Products — `store` (50 products)
+| Sub-category |
+|---|
+| Educational toys, Action figures, Puzzle games |
+| Diapers, Baby food, Baby skincare |
+| Strollers, Car seats, Cribs |
+
+### Automotive — `store` (40 products)
+| Sub-category |
+|---|
+| Seat covers, Air fresheners, Phone mounts |
+| Engine oil, Cleaning kits, Tires |
 
 ---
 
-# 🧬 MASTER PRODUCT SCHEMA
+## Product Schema (how fields map to `crm_products`)
+
+| Synthetic field | `crm_products` column | Notes |
+|---|---|---|
+| name | `name` | `"{Brand} {Sub-category}"`, deduplicated |
+| price | `unit_price` | Per-category price ranges below |
+| discount (0.0–0.40) | `discount_percentage` | Stored as `%` (e.g. 0.20 → 20.00) |
+| price × discount | `discount_price` | Absolute discount amount |
+| price − discount_price | `after_discount_price` | Final price paid |
+| category, sub_category, brand, gender_target, age_group, material, season, style, color, size_range, rating, review_count, popularity_score, stock | `description` (JSON) | Full metadata blob |
+| [sub_cat, category, material, style, season, gender] | `custom_description` (JSON array) | Keyword tags for search |
+| — | `product_type` | `"food"` for Food & Groceries, `"store"` for all others |
+| — | `review_status` | Always `"approved"` |
+| — | `total_views` | Derived from review_count × random factor |
+
+### `description` JSON structure
 
 ```json
 {
-  "product_id": "string",
-  "name": "string",
-  "category": "string",
-  "sub_category": "string",
-  "gender_target": "men | women | kids | unisex",
-  "age_group": "infant | child | teen | adult",
-  "brand": "string",
-  "price": "float",
-  "discount": "float",
-  "final_price": "float",
-  "color": ["string"],
-  "size_range": ["XS","S","M","L","XL"],
-  "material": ["string"],
-  "season": "summer | winter | all-season | spring | autumn",
-  "style": "casual | formal | streetwear | sporty | traditional",
-  "rating": "float (1-5)",
-  "review_count": "int",
-  "popularity_score": "float (1-5)",
-  "stock": "int",
-  "tags": ["string"],
-  "created_at": "datetime"
+  "brand": "Nike",
+  "category": "Fashion & Apparel",
+  "sub_category": "Sneakers",
+  "gender_target": "unisex",
+  "age_group": "adult",
+  "material": ["rubber", "nylon"],
+  "season": "all-season",
+  "style": "sporty",
+  "color": ["black", "white"],
+  "size_range": ["S", "M", "L", "XL"],
+  "rating": 4.2,
+  "review_count": 3481,
+  "popularity_score": 3.2,
+  "stock": 187
 }
-
-
-🧭 CATEGORY TAXONOMY (STRICT — DO NOT MODIFY)
-👕 Fashion & Apparel
-Men’s Clothing
-T-shirts
-Shirts (formal)
-Shirts (casual)
-Jeans
-Trousers
-Jackets
-Traditional wear
-Women’s Clothing
-Dresses
-Tops / Blouses
-Skirts
-Jeans / Pants
-Outerwear
-Traditional wear
-Kids’ Clothing
-Boys clothing
-Girls clothing
-Infant wear
-Footwear
-Sneakers
-Formal shoes
-Sandals / Slippers
-Boots
-Accessories
-Bags (backpacks, handbags)
-Belts
-Hats / Caps
-Wallets
-📱 Electronics & Devices
-Mobile Phones
-Android phones
-iPhones
-Feature phones
-Laptops & Computers
-Laptops
-Desktops
-Monitors
-PC components
-Audio Devices
-Headphones
-Earbuds
-Speakers
-Smart Devices
-Smartwatches
-Smart home devices
-Fitness trackers
-Accessories
-Chargers
-Cables
-Power banks
-Cases
-🏠 Home & Living
-Furniture
-Beds
-Tables
-Chairs
-Sofas
-Storage
-Kitchen & Dining
-Cookware
-Utensils
-Dinnerware
-Appliances
-Home Decor
-Wall art
-Lighting
-Carpets
-Curtains
-Cleaning Supplies
-Detergents
-Cleaning tools
-Disinfectants
-💄 Beauty & Personal Care
-Skincare
-Face wash
-Moisturizer
-Sunscreen
-Serums
-Makeup
-Lipstick
-Foundation
-Eye makeup
-Brushes
-Hair Care
-Shampoo
-Conditioner
-Hair treatments
-Personal Care
-Soap
-Deodorant
-Oral care
-🍜 Food & Groceries
-Fresh Food
-Vegetables
-Fruits
-Meat & seafood
-Packaged Food
-Snacks
-Instant noodles
-Cereals
-Beverages
-Soft drinks
-Coffee / Tea
-Juices
-Household Essentials
-Rice / grains
-Cooking oil
-Condiments
-📚 Books & Education
-Academic Books
-Computer Science
-Mathematics
-Business
-Self-development
-Productivity
-Communication
-Leadership
-Children Books
-Story books
-Learning books
-Stationery
-Notebooks
-Pens
-Art supplies
-🏃 Sports & Outdoors
-Fitness Equipment
-Dumbbells
-Yoga mats
-Resistance bands
-Sports Gear
-Football
-Basketball
-Badminton
-Outdoor Gear
-Camping tents
-Backpacks
-Water bottles
-🧸 Toys & Baby Products
-Toys
-Educational toys
-Action figures
-Puzzle games
-Baby Care
-Diapers
-Baby food
-Baby skincare
-Baby Gear
-Strollers
-Car seats
-Cribs
-🚗 Automotive
-Car Accessories
-Seat covers
-Air fresheners
-Phone mounts
-Maintenance
-Engine oil
-Cleaning kits
-Tires
-⚙️ GENERATION RULES
-1. Consistency Rules
-category must match sub_category exactly
-gender_target must match product type
-age_group must be logically correct
-materials must match category
-2. Pricing Rules
-T-shirts: 5–25
-Shirts: 10–40
-Jeans: 20–60
-Jackets: 30–120
-Shoes: 15–100
-Bags: 10–80
-Electronics: 50–1500
-Beauty: 3–80
-Groceries: 1–50
-
-final_price = price - (price × discount)
-
-discount range: 0.0 – 0.4
-
-3. Popularity Logic
-rating: 1.0 – 5.0
-review_count: 0 – 10000
-popularity_score must correlate with rating and review_count
-4. Tag Rules
-
-Each product must include:
-
-sub_category keyword
-category keyword
-material
-style
-season
-gender_target
-5. Behavioral Realism
-Electronics → lower frequency, high value
-Groceries → high frequency, low value
-Fashion → medium frequency, high variety
-Beauty → repeat purchase behavior
-🎯 TASK
-
-Generate 500 synthetic products following all rules above.
-
-Ensure:
-
-Balanced category distribution
-No duplicate product names
-No missing fields
-Realistic attribute combinations
-Diverse brands and pricing spread
-
 ```
 
-This is basically the new product that i want u to generate and replace to current one as it is kinda wiered and does not make any sense for current product in database.
+---
 
-don't change any table or column just adding this into the product table
+## Pricing Rules
+
+| Category | Price range (USD) |
+|---|---|
+| T-shirts | 5–25 |
+| Shirts / Tops | 10–40 |
+| Jeans / Trousers | 20–60 |
+| Jackets / Outerwear | 30–120 |
+| Footwear / Bags | 15–100 |
+| Electronics | 50–1500 |
+| Beauty | 3–80 |
+| Food & Groceries | 1–50 |
+| Sports & Outdoors | 5–300 |
+| Toys & Baby | 5–300 |
+| Automotive | 5–200 |
+| Home & Living | 5–500 |
+| Books & Education | 2–60 |
+
+`discount` is drawn uniformly from `0.00–0.40`.
+`after_discount_price = unit_price × (1 − discount)`.
+
+---
+
+## Popularity Logic
+
+```
+rating        ∈ [1.0, 5.0]
+review_count  ∈ [0, 10 000]
+popularity_score = min(5.0, rating × 0.6 + (review_count / 10 000) × 2.0)
+total_views   = review_count × Uniform(1.5, 4.0)
+```
+
+---
+
+## Re-seeding
+
+```bash
+python3 scripts/seed_synthetic_products.py
+```
+
+The script truncates all product-dependent tables before inserting, so it is safe to re-run.
+Tables affected: `crm_products`, `benefit_me_categories`, `crm_product_views`,
+`benefit_me_reach_products`, `benefit_me_engagements`, `employee_products`,
+`crm_benefit_sold_products`, `crm_benefit_more_info_archives`,
+`crm_product_restaurants`, `crm_product_stores`, `crm_product_services`,
+`crm_benefit_promotion_categories`.
+
+Tables **not** touched: `employees`, `benefit_me_page_types`, `crm_benefit_promotions`,
+`benefit_me_payment_histories`.

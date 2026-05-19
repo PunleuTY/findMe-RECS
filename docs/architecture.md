@@ -66,3 +66,27 @@ The `_load_interactions()` query in `ml/data_loader.py` unions four tables:
 | `benefit_me_reach_products` | view (aggregated) | 1 |
 | `benefit_me_engagements` | view / lead / buy | 1 / 4 / 8 |
 | `crm_benefit_more_info_archives` | view / lead / buy | 1 / 4 / 8 |
+
+## Product dataset (BenefitMe synthetic catalogue)
+
+The database is seeded with **500 synthetic products** across **9 categories** via `scripts/seed_synthetic_products.py`. Category-to-page-type mapping:
+
+| Category | Page type | Products |
+|---|---|---|
+| Fashion & Apparel | store | 90 |
+| Food & Groceries | food | 70 |
+| Electronics & Devices | store | 55 |
+| Home & Living | store | 55 |
+| Beauty & Personal Care | store | 55 |
+| Sports & Outdoors | store | 50 |
+| Toys & Baby Products | store | 50 |
+| Automotive | store | 40 |
+| Books & Education | store | 35 |
+
+Rich product metadata (brand, sub-category, gender target, materials, season, style, color, sizes, rating, review count, popularity score, stock) is stored as a JSON blob in `crm_products.description`. Tags for keyword search are stored in `crm_products.custom_description` as a JSON array.
+
+Re-run the seeder at any time to reset the catalogue to a clean synthetic state:
+
+```bash
+python3 scripts/seed_synthetic_products.py
+```
