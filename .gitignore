@@ -1,0 +1,27 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.eggs/
+.coverage
+htmlcov/
+.pytest_cache/
+*.so
+
+# Environment
+.env
+.env.local
+
+# Data (runtime-generated; commit only .gitkeep)
+data/generated/*.json
+data/raw/
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# macOS
+.DS_Store
